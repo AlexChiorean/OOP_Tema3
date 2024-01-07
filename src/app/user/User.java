@@ -14,11 +14,16 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static app.user.GetTopFive.getTopFive;
 
 /**
  * The type User.
@@ -46,6 +51,17 @@ public final class User extends UserAbstract {
     @Setter
     private LikedContentPage likedContentPage;
 
+    @Getter @Setter
+    private Map<String, Integer> topArtists;
+    @Getter @Setter
+    private Map<String, Integer> topGenres;
+    @Getter @Setter
+    private Map<String, Integer> topSongs;
+    @Getter @Setter
+    private Map<String, Integer> topAlbums;
+    @Getter @Setter
+    private Map<String, Integer> topEpisodes;
+
     /**
      * Instantiates a new User.
      *
@@ -66,6 +82,12 @@ public final class User extends UserAbstract {
         homePage = new HomePage(this);
         currentPage = homePage;
         likedContentPage = new LikedContentPage(this);
+
+        topArtists = new HashMap<>();
+        topGenres = new HashMap<>();
+        topSongs = new HashMap<>();
+        topAlbums = new HashMap<>();
+        topEpisodes = new HashMap<>();
     }
 
     @Override
@@ -588,5 +610,21 @@ public final class User extends UserAbstract {
         }
 
         player.simulatePlayer(time);
+    }
+
+    /**
+     * Gets wrapped stats.
+     *
+     * @return the wrapped stats
+     */
+    public ArrayNode wrapped() {
+        Map<String, Integer> sortedTopArtists = getTopFive(topArtists);
+        Map<String, Integer> sortedTopGenres = getTopFive(topGenres);
+        Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
+        Map<String, Integer> sortedTopAlbums = getTopFive(topAlbums);
+        Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
+
+        //urmeaza
+        return null;
     }
 }

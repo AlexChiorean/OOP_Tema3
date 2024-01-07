@@ -2,8 +2,15 @@ package app.user;
 
 import app.audio.Collections.Podcast;
 import app.pages.HostPage;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static app.user.GetTopFive.getTopFive;
 
 /**
  * The type Host.
@@ -11,6 +18,11 @@ import java.util.ArrayList;
 public final class Host extends ContentCreator {
     private ArrayList<Podcast> podcasts;
     private ArrayList<Announcement> announcements;
+
+    @Getter @Setter
+    private Map<String, Integer> topEpisodes;
+    @Getter @Setter
+    private int listeners;
 
     /**
      * Instantiates a new Host.
@@ -25,6 +37,9 @@ public final class Host extends ContentCreator {
         announcements = new ArrayList<>();
 
         super.setPage(new HostPage(this));
+
+        topEpisodes = new HashMap<>();
+        listeners = 0;
     }
 
     /**
@@ -98,5 +113,17 @@ public final class Host extends ContentCreator {
     @Override
     public String userType() {
         return "host";
+    }
+
+    /**
+     * Gets wrapped stats.
+     *
+     * @return the wrapped stats
+     */
+    public ArrayNode wrapped() {
+        Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
+
+        //urmeaza
+        return null;
     }
 }

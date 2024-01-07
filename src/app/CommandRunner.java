@@ -9,6 +9,7 @@ import app.user.Artist;
 import app.user.Host;
 import app.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
 
@@ -778,6 +779,24 @@ public final class CommandRunner {
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(playlists));
+
+        return objectNode;
+    }
+
+    /**
+     * Gets wrapped statistics.
+     *
+     * @param commandInput the command input
+     * @return the wrapped stats
+     */
+    public static ObjectNode wrapped(final CommandInput commandInput) {
+        ArrayNode wrappedStats = admin.wrapped(commandInput);
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(wrappedStats));
 
         return objectNode;
     }

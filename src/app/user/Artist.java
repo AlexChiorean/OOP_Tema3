@@ -1,12 +1,17 @@
 package app.user;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Files.Song;
 import app.pages.ArtistPage;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import static app.user.GetTopFive.getTopFive;
+import lombok.Getter;
+import lombok.Setter;
+
+
 
 /**
  * The type Artist.
@@ -15,6 +20,15 @@ public final class Artist extends ContentCreator {
     private ArrayList<Album> albums;
     private ArrayList<Merchandise> merch;
     private ArrayList<Event> events;
+
+    @Getter @Setter
+    private Map<String, Integer> topAlbums;
+    @Getter @Setter
+    private Map<String, Integer> topSongs;
+    @Getter @Setter
+    private Map<String, Integer> topFans;
+    @Getter @Setter
+    private int listeners;
 
     /**
      * Instantiates a new Artist.
@@ -30,6 +44,11 @@ public final class Artist extends ContentCreator {
         events = new ArrayList<>();
 
         super.setPage(new ArtistPage(this));
+
+        topAlbums = new HashMap<>();
+        topSongs = new HashMap<>();
+        topFans = new HashMap<>();
+        listeners = 0;
     }
 
     /**
@@ -124,5 +143,19 @@ public final class Artist extends ContentCreator {
      */
     public String userType() {
         return "artist";
+    }
+
+    /**
+     * Gets wrapped stats.
+     *
+     * @return the wrapped stats
+     */
+    public ArrayNode wrapped() {
+        Map<String, Integer> sortedTopAlbums = getTopFive(topAlbums);
+        Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
+        Map<String, Integer> sortedTopFans = getTopFive(topFans);
+
+        //urmeaza
+        return null;
     }
 }

@@ -15,6 +15,7 @@ import app.user.Host;
 import app.user.Merchandise;
 import app.user.User;
 import app.user.UserAbstract;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import fileio.input.CommandInput;
 import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
  * The type Admin.
  */
 public final class Admin {
+    @Getter
     private List<User> users = new ArrayList<>();
     @Getter
     private List<Artist> artists = new ArrayList<>();
@@ -872,5 +874,29 @@ public final class Admin {
             count++;
         }
         return topPlaylists;
+    }
+
+    /**
+     * Gets wrapped stats.
+     *
+     * @return the wrapped stats
+     */
+    public ArrayNode wrapped(final CommandInput commandInput) {
+        for (Artist artist : getArtists()) {
+            if (artist.getUsername().equals(commandInput.getUsername())) {
+                return artist.wrapped();
+            }
+        }
+        for (User user : getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())) {
+                return user.wrapped();
+            }
+        }
+        for (Host host : getHosts()) {
+            if (host.getUsername().equals(commandInput.getUsername())) {
+                return host.wrapped();
+            }
+        }
+        return null;
     }
 }
