@@ -14,7 +14,9 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static app.user.GetTopFive.getTopFive;
+import static app.utils.MapManagement.addMapToNode;
+import static app.utils.MapManagement.getTopFive;
 
 /**
  * The type User.
@@ -184,6 +187,9 @@ public final class User extends UserAbstract {
         }
 
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
+//        if (searchBar.getLastSearchType().equals("song")) {
+//            topSongs.put(searchBar.getLastSelected().getName(), (k, v) -> (v == null) ? 1 : v+1);
+//        }
         searchBar.clearSelection();
 
         player.pause();
@@ -624,7 +630,14 @@ public final class User extends UserAbstract {
         Map<String, Integer> sortedTopAlbums = getTopFive(topAlbums);
         Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
 
-        //urmeaza
-        return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode output = objectMapper.createArrayNode();
+
+        addMapToNode(output, "topArtists", sortedTopArtists);
+        addMapToNode(output, "topGenres", sortedTopGenres);
+        addMapToNode(output, "topSongs", sortedTopSongs);
+        addMapToNode(output, "topAlbums", sortedTopAlbums);
+        addMapToNode(output, "topEpisodes", sortedTopEpisodes);
+        return output;
     }
 }

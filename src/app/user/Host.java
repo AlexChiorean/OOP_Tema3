@@ -2,7 +2,9 @@ package app.user;
 
 import app.audio.Collections.Podcast;
 import app.pages.HostPage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static app.user.GetTopFive.getTopFive;
+import static app.utils.MapManagement.addMapToNode;
+import static app.utils.MapManagement.getTopFive;
 
 /**
  * The type Host.
@@ -123,7 +126,14 @@ public final class Host extends ContentCreator {
     public ArrayNode wrapped() {
         Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
 
-        //urmeaza
-        return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode output = objectMapper.createArrayNode();
+
+        addMapToNode(output, "topEpisodes", sortedTopEpisodes);
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("listeners", listeners);
+        output.add(objectNode);
+        return output;
     }
 }

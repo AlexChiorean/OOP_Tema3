@@ -6,8 +6,13 @@ import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Files.Song;
 import app.pages.ArtistPage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import static app.user.GetTopFive.getTopFive;
+
+import static app.utils.MapManagement.addMapToNode;
+import static app.utils.MapManagement.getTopFive;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -155,7 +160,16 @@ public final class Artist extends ContentCreator {
         Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
         Map<String, Integer> sortedTopFans = getTopFive(topFans);
 
-        //urmeaza
-        return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode output = objectMapper.createArrayNode();
+
+        addMapToNode(output, "topAlbums", sortedTopAlbums);
+        addMapToNode(output, "topSongs", sortedTopSongs);
+        addMapToNode(output, "topFans", sortedTopFans);
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("listeners", listeners);
+        output.add(objectNode);
+        return output;
     }
 }
