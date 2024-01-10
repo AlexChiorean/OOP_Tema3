@@ -644,7 +644,33 @@ public final class User extends UserAbstract {
      *
      * @return the wrapped stats
      */
-    public ObjectNode wrapped() {
+    public ObjectNode wrapped(final int timestamp) {
+        if (searchBar.getLastSearchType() != null) {
+            if (searchBar.getLastSearchType().equals("song")) {
+                Song song = (Song) searchBar.getLastSelected();
+                updateSongStats(this, song);
+            }
+
+            if (player.getLastLoadedSource() != null
+                    && player.getType().equals("playlist")) {
+
+                Playlist playlist = (Playlist) player.getCurrentAudioCollection();
+                updatePlaylistStats(this, player, playlist, timestamp);
+
+            } else if (player.getLastLoadedSource() != null
+                    && player.getType().equals("album")) {
+
+                Album album = (Album) player.getCurrentAudioCollection();
+                updateAlbumStats(this, player, album, timestamp);
+
+            } else if (player.getLastLoadedSource() != null
+                    && player.getType().equals("podcast")) {
+
+                Podcast podcast = (Podcast) player.getCurrentAudioCollection();
+                updatePodcastStats(this, player, podcast, timestamp);
+            }
+        }
+
         Map<String, Integer> sortedTopArtists = getTopFive(topArtists);
         Map<String, Integer> sortedTopGenres = getTopFive(topGenres);
         Map<String, Integer> sortedTopSongs = getTopFive(topSongs);

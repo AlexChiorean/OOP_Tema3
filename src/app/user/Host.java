@@ -25,6 +25,8 @@ public final class Host extends ContentCreator {
     @Getter @Setter
     private Map<String, Integer> topEpisodes;
     @Getter @Setter
+    private Map<String, Integer> topFans;
+    @Getter @Setter
     private int listeners;
 
     /**
@@ -42,6 +44,7 @@ public final class Host extends ContentCreator {
         super.setPage(new HostPage(this));
 
         topEpisodes = new HashMap<>();
+        topFans = new HashMap<>();
         listeners = 0;
     }
 
@@ -131,7 +134,7 @@ public final class Host extends ContentCreator {
 
         addMapToNode(output, "topEpisodes", sortedTopEpisodes);
 
-        output.put("listeners", listeners);
+        output.put("listeners", topFans.size());
         return output;
     }
 }

@@ -898,7 +898,7 @@ public final class Admin {
         }
         for (User user : getUsers()) {
             if (user.getUsername().equals(commandInput.getUsername())) {
-                return user.wrapped();
+                return user.wrapped(commandInput.getTimestamp());
             }
         }
         for (Host host : getHosts()) {
@@ -915,16 +915,15 @@ public final class Admin {
      * @return the end program stats
      */
     public ObjectNode endProgram() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode output = objectMapper.createObjectNode();
-
         for (Artist artist : getArtists()) {
             if (!artist.getTopFans().isEmpty()) {
                 topRevenue.put(artist.getUsername(), artist.getSales());
             }
         }
-
         topRevenue = sortByKeyThenValue(topRevenue);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode output = objectMapper.createObjectNode();
 
         int ranking = 1;
         for (Map.Entry<String, Integer> entry : topRevenue.entrySet()) {

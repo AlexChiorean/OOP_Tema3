@@ -149,6 +149,7 @@ public class MapManagement {
         for (Host host : app.Admin.getInstance().getHosts()) {
             if (host.getUsername().equals(podcast.getOwner())) {
                 host.getTopEpisodes().merge(episode.getName(), 1, Integer::sum);
+                host.getTopFans().merge(user.getUsername(), 1, Integer::sum);
             }
         }
     }

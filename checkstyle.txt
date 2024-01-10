@@ -13,7 +13,7 @@ Starting audit...
 [ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:13:8: Unused import - com.fasterxml.jackson.databind.node.ArrayNode. [UnusedImports]
 [ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:16:17: Using the '.*' form of import should be avoided - java.util.*. [AvoidStarImport]
 [ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:19:1: Utility classes should not have a public or default constructor. [HideUtilityClassConstructor]
-[ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:34:13: 'if' construct must use '{}'s. [NeedBraces]
-[ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:34:26: '5' is a magic number. [MagicNumber]
+[ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:57:13: 'if' construct must use '{}'s. [NeedBraces]
+[ERROR] D:\Documents\~FACULTATE\OOP\Tema3\etapa3\.\src\app\utils\MapManagement.java:57:26: '5' is a magic number. [MagicNumber]
 Audit done.
 Checkstyle ends with 16 errors.

@@ -790,13 +790,26 @@ public final class CommandRunner {
      * @return the wrapped stats
      */
     public static ObjectNode wrapped(final CommandInput commandInput) {
+        String message = null;
+        for (User user : admin.getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())
+            && user.getTopSongs().isEmpty() && user.getTopEpisodes().isEmpty()) {
+                message = "No data to show for user " + user.getUsername() + ".";
+            }
+        }
+
         ObjectNode wrappedStats = admin.wrapped(commandInput);
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
-        objectNode.put("result", wrappedStats);
+
+        if (message == null) {
+            objectNode.put("result", wrappedStats);
+        } else {
+            objectNode.put("message", message);
+        }
 
         return objectNode;
     }
