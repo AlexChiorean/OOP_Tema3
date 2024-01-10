@@ -1,9 +1,8 @@
 package app.user;
 
-import app.audio.Collections.AudioCollection;
-import app.audio.Collections.Playlist;
-import app.audio.Collections.PlaylistOutput;
+import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
+import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
 import app.pages.HomePage;
@@ -14,6 +13,7 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
+import app.utils.MapManagement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static app.utils.MapManagement.addMapToNode;
-import static app.utils.MapManagement.getTopFive;
+import static app.utils.MapManagement.*;
 
 /**
  * The type User.
@@ -172,7 +171,7 @@ public final class User extends UserAbstract {
      *
      * @return the string
      */
-    public String load() {
+    public String load(final int timestamp) {
         if (!status) {
             return "%s is offline.".formatted(getUsername());
         }
@@ -186,10 +185,32 @@ public final class User extends UserAbstract {
             return "You can't load an empty audio collection!";
         }
 
+        if (searchBar.getLastSearchType().equals("song")) {
+            Song song = (Song) searchBar.getLastSelected();
+            updateSongStats(this, song);
+        }
+
+        if (player.getLastLoadedSource() != null
+                && player.getType().equals("playlist")) {
+
+            Playlist playlist = (Playlist) player.getCurrentAudioCollection();
+            updatePlaylistStats(this, player, playlist, timestamp);
+
+        } else if (player.getLastLoadedSource() != null
+                && player.getType().equals("album")) {
+
+            Album album = (Album) player.getCurrentAudioCollection();
+            updateAlbumStats(this, player, album, timestamp);
+
+        } else if (player.getLastLoadedSource() != null
+                && player.getType().equals("podcast")) {
+
+            Podcast podcast = (Podcast) player.getCurrentAudioCollection();
+            updatePodcastStats(this, player, podcast, timestamp);
+        }
+
+        player.setLastTimestamp(timestamp);
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
-//        if (searchBar.getLastSearchType().equals("song")) {
-//            topSongs.put(searchBar.getLastSelected().getName(), (k, v) -> (v == null) ? 1 : v+1);
-//        }
         searchBar.clearSelection();
 
         player.pause();
@@ -623,7 +644,7 @@ public final class User extends UserAbstract {
      *
      * @return the wrapped stats
      */
-    public ArrayNode wrapped() {
+    public ObjectNode wrapped() {
         Map<String, Integer> sortedTopArtists = getTopFive(topArtists);
         Map<String, Integer> sortedTopGenres = getTopFive(topGenres);
         Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
@@ -631,7 +652,7 @@ public final class User extends UserAbstract {
         Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode output = objectMapper.createArrayNode();
+        ObjectNode output = objectMapper.createObjectNode();
 
         addMapToNode(output, "topArtists", sortedTopArtists);
         addMapToNode(output, "topGenres", sortedTopGenres);
@@ -641,3 +662,4 @@ public final class User extends UserAbstract {
         return output;
     }
 }
+

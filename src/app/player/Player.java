@@ -5,6 +5,7 @@ import app.audio.Files.AudioFile;
 import app.audio.LibraryEntry;
 import app.utils.Enums;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,10 @@ public final class Player {
     @Getter
     private String type;
     private final int skipTime = 90;
+    @Getter @Setter
+    private int lastTimestamp;
+    @Getter
+    private PlayerSource lastLoadedSource;
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
@@ -108,6 +113,7 @@ public final class Player {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.shuffle = false;
         this.paused = true;
+        this.lastLoadedSource = createSource(sourceType, entry, bookmarks);
     }
 
     /**
@@ -248,6 +254,9 @@ public final class Player {
      */
     public AudioCollection getCurrentAudioCollection() {
         if (source == null) {
+            if (lastLoadedSource != null) {
+                return lastLoadedSource.getAudioCollection();
+            }
             return null;
         }
         return source.getAudioCollection();

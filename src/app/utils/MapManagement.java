@@ -1,32 +1,57 @@
 package app.utils;
 
+import app.audio.Collections.Album;
+import app.audio.Collections.Playlist;
+import app.audio.Collections.Podcast;
+import app.audio.Files.Episode;
+import app.audio.Files.Song;
+import app.player.Player;
+import app.user.Artist;
+import app.user.Host;
+import app.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Comparator;
+import java.util.*;
 
 
 public class MapManagement {
+
     /**
-     * Sorts the hash map by the value, and returns the first 5 entries.
+     * Sorts map by value, then by key.
+     *
+     * @param map the unsorted map
+     * @return the sorted map
+     */
+    public static Map<String, Integer> sortByKeyThenValue(final Map<String, Integer> map) {
+        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(map.entrySet());
+
+        Comparator<Map.Entry<String, Integer>> byValueAndKey = Comparator
+                .<Map.Entry<String, Integer>>comparingInt(Map.Entry::getValue).reversed()
+                .thenComparing(Map.Entry::getKey);
+
+        entryList.sort(byValueAndKey);
+
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
+    /**
+     * Returns the first 5 entries of the sorted map.
      *
      * @param hashMap
      * @return sorted top 5
      */
     public static Map<String, Integer> getTopFive(final Map<String, Integer> hashMap) {
 
-        List<Map.Entry<String, Integer>> entryList = new ArrayList<>(hashMap.entrySet());
-        Comparator<Map.Entry<String, Integer>> byValue = Map.Entry.comparingByValue();
-        entryList.sort(byValue);
-
+        Map<String, Integer> entryList = sortByKeyThenValue(hashMap);
         int count = 0;
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> entry : entryList) {
+        for (Map.Entry<String, Integer> entry : entryList.entrySet()) {
             count++;
             sortedMap.put(entry.getKey(), entry.getValue());
             if (count == 5) return sortedMap;
@@ -37,18 +62,114 @@ public class MapManagement {
     /**
      * Adds the contents of the map to a node.
      */
-    public static void addMapToNode(final ArrayNode outputs,
+    public static void addMapToNode(final ObjectNode outputs,
                                     final String field,
                                     final Map<String, Integer> map) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objectNode = objectMapper.createObjectNode();
         ObjectNode nodeList = objectMapper.createObjectNode();
 
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
             nodeList.put(entry.getKey(), entry.getValue());
         }
-        objectNode.put(field, nodeList);
-        outputs.add(objectNode);
+        outputs.put(field, nodeList);
+    }
+
+    /**
+     * Updates the hash maps with the new stats for
+     * both the user and the song's artist.
+     */
+    public static void updateSongStats(final User user,
+                                       final Song song) {
+
+        user.getTopSongs().merge(song.getName(), 1, Integer::sum);
+        user.getTopGenres().merge(song.getGenre(), 1, Integer::sum);
+        user.getTopAlbums().merge(song.getAlbum(), 1, Integer::sum);
+        user.getTopArtists().merge(song.getArtist(), 1, Integer::sum);
+
+        for (Artist artist : app.Admin.getInstance().getArtists()) {
+            if (artist.getUsername().equals(song.getArtist())) {
+                artist.getTopFans().merge(user.getUsername(), 1, Integer::sum);
+                artist.getTopSongs().merge(song.getName(), 1, Integer::sum);
+                artist.getTopAlbums().merge(song.getAlbum(), 1, Integer::sum);
+            }
+        }
+    }
+
+    /**
+     * Updates the hash maps with the new stats for
+     * both the user and the songs' artists.
+     */
+    public static void updatePlaylistStats(final User user,
+                                           final Player player,
+                                           final Playlist playlist,
+                                           final int timestamp) {
+
+        int timeInterval = timestamp - player.getLastTimestamp();
+        if (playlist != null) {
+            for (Song song : playlist.getSongs()) {
+                if (timeInterval >= 0) {
+                    timeInterval -= song.getDuration();
+                    updateSongStats(user, song);
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the hash maps with the new stats for
+     * both the user and the songs' artist.
+     */
+    public static void updateAlbumStats(final User user,
+                                        final Player player,
+                                        final Album album,
+                                        final int timestamp) {
+
+        int timeInterval = timestamp - player.getLastTimestamp();
+        if (album != null) {
+            for (Song song : album.getSongs()) {
+                if (timeInterval >= 0) {
+                    timeInterval -= song.getDuration();
+                    updateSongStats(user, song);
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the hash maps with the new stats for
+     * both the user and the episode's owner.
+     */
+    public static void updateEpisodeStats(final User user,
+                                          final Episode episode,
+                                          final Podcast podcast) {
+
+        user.getTopEpisodes().merge(episode.getName(), 1, Integer::sum);
+
+        for (Host host : app.Admin.getInstance().getHosts()) {
+            if (host.getUsername().equals(podcast.getOwner())) {
+                host.getTopEpisodes().merge(episode.getName(), 1, Integer::sum);
+            }
+        }
+    }
+
+    /**
+     * Updates the hash maps with the new stats for
+     * both the user and the episodes' owner.
+     */
+    public static void updatePodcastStats(final User user,
+                                          final Player player,
+                                          final Podcast podcast,
+                                          final int timestamp) {
+
+        int timeInterval = timestamp - player.getLastTimestamp();
+        if (podcast != null) {
+            for (Episode episode : podcast.getEpisodes()) {
+                if (timeInterval >= 0) {
+                    timeInterval -= episode.getDuration();
+                    updateEpisodeStats(user, episode, podcast);
+                }
+            }
+        }
     }
 }

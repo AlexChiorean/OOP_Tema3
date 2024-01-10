@@ -92,7 +92,7 @@ public final class CommandRunner {
      */
     public static ObjectNode load(final CommandInput commandInput) {
         User user = admin.getUser(commandInput.getUsername());
-        String message = user.load();
+        String message = user.load(commandInput.getTimestamp());
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -790,14 +790,26 @@ public final class CommandRunner {
      * @return the wrapped stats
      */
     public static ObjectNode wrapped(final CommandInput commandInput) {
-        ArrayNode wrappedStats = admin.wrapped(commandInput);
+        ObjectNode wrappedStats = admin.wrapped(commandInput);
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
-        objectNode.put("result", objectMapper.valueToTree(wrappedStats));
+        objectNode.put("result", wrappedStats);
 
+        return objectNode;
+    }
+
+    /**
+     * End program results.
+     *
+     * @return the wrapped stats
+     */
+    public static ObjectNode endProgram() {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", "endProgram");
+        objectNode.put("result", admin.endProgram());
         return objectNode;
     }
 }

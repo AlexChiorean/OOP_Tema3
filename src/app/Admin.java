@@ -15,13 +15,16 @@ import app.user.Host;
 import app.user.Merchandise;
 import app.user.User;
 import app.user.UserAbstract;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import fileio.input.CommandInput;
 import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +37,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static app.utils.MapManagement.sortByKeyThenValue;
 
 /**
  * The type Admin.
@@ -60,7 +65,11 @@ public final class Admin {
     private final int dateFebHigherLimit = 28;
     private static Admin instance;
 
+    @Getter @Setter
+    private Map<String, Integer> topRevenue;
+
     private Admin() {
+        topRevenue = new HashMap<>();
     }
 
     /**
@@ -881,7 +890,7 @@ public final class Admin {
      *
      * @return the wrapped stats
      */
-    public ArrayNode wrapped(final CommandInput commandInput) {
+    public ObjectNode wrapped(final CommandInput commandInput) {
         for (Artist artist : getArtists()) {
             if (artist.getUsername().equals(commandInput.getUsername())) {
                 return artist.wrapped();
@@ -898,5 +907,41 @@ public final class Admin {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets end program stats.
+     *
+     * @return the end program stats
+     */
+    public ObjectNode endProgram() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode output = objectMapper.createObjectNode();
+
+        for (Artist artist : getArtists()) {
+            if (!artist.getTopFans().isEmpty()) {
+                topRevenue.put(artist.getUsername(), artist.getSales());
+            }
+        }
+
+        topRevenue = sortByKeyThenValue(topRevenue);
+
+        int ranking = 1;
+        for (Map.Entry<String, Integer> entry : topRevenue.entrySet()) {
+            for (Artist artist : getArtists()) {
+                if (artist.getUsername().equals(entry.getKey())) {
+                    ObjectNode nodeList = objectMapper.createObjectNode();
+
+                    nodeList.put("merchRevenue", artist.getMerchRevenue());
+                    nodeList.put("songRevenue", artist.getSongRevenue());
+                    nodeList.put("ranking", ranking);
+                    nodeList.put("mostProfitableSong", artist.getMostProfitableSong());
+
+                    output.put(artist.getUsername(), nodeList);
+                }
+            }
+            ranking++;
+        }
+        return output;
     }
 }

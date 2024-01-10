@@ -35,6 +35,15 @@ public final class Artist extends ContentCreator {
     @Getter @Setter
     private int listeners;
 
+    @Getter @Setter
+    private double merchRevenue;
+    @Getter @Setter
+    private double songRevenue;
+    @Getter @Setter
+    private int sales;
+    @Getter @Setter
+    private String mostProfitableSong;
+
     /**
      * Instantiates a new Artist.
      *
@@ -54,6 +63,11 @@ public final class Artist extends ContentCreator {
         topSongs = new HashMap<>();
         topFans = new HashMap<>();
         listeners = 0;
+
+        merchRevenue = 0;
+        songRevenue = 0;
+        sales = 0;
+        mostProfitableSong = "N/A";
     }
 
     /**
@@ -155,21 +169,22 @@ public final class Artist extends ContentCreator {
      *
      * @return the wrapped stats
      */
-    public ArrayNode wrapped() {
+    public ObjectNode wrapped() {
         Map<String, Integer> sortedTopAlbums = getTopFive(topAlbums);
         Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
         Map<String, Integer> sortedTopFans = getTopFive(topFans);
+        Set<String> keySet = sortedTopFans.keySet();
+        List<String> topFansNames = new ArrayList<>(keySet);
+
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode output = objectMapper.createArrayNode();
+        ObjectNode output = objectMapper.createObjectNode();
 
         addMapToNode(output, "topAlbums", sortedTopAlbums);
         addMapToNode(output, "topSongs", sortedTopSongs);
-        addMapToNode(output, "topFans", sortedTopFans);
+        output.put( "topFans", objectMapper.valueToTree(topFansNames));
 
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("listeners", listeners);
-        output.add(objectNode);
+        output.put("listeners", topFans.size());
         return output;
     }
 }

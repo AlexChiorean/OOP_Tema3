@@ -123,17 +123,15 @@ public final class Host extends ContentCreator {
      *
      * @return the wrapped stats
      */
-    public ArrayNode wrapped() {
+    public ObjectNode wrapped() {
         Map<String, Integer> sortedTopEpisodes = getTopFive(topEpisodes);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode output = objectMapper.createArrayNode();
+        ObjectNode output = objectMapper.createObjectNode();
 
         addMapToNode(output, "topEpisodes", sortedTopEpisodes);
 
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("listeners", listeners);
-        output.add(objectNode);
+        output.put("listeners", listeners);
         return output;
     }
 }
