@@ -2,6 +2,7 @@ package app.player;
 
 import app.audio.Collections.AudioCollection;
 import app.audio.Files.AudioFile;
+import app.audio.Files.Song;
 import app.audio.LibraryEntry;
 import app.utils.Enums;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public final class Player {
     private int lastTimestamp;
     @Getter
     private PlayerSource lastLoadedSource;
+    @Getter @Setter
+    private Song currentSong;
 
     private ArrayList<PodcastBookmark> bookmarks = new ArrayList<>();
 
@@ -36,6 +39,7 @@ public final class Player {
     public Player() {
         this.repeatMode = Enums.RepeatMode.NO_REPEAT;
         this.paused = true;
+        this.currentSong = null;
     }
 
     /**

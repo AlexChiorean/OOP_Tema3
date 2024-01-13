@@ -17,6 +17,7 @@ import app.utils.MapManagement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fileio.input.CommandInput;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +42,7 @@ public final class User extends UserAbstract {
     private final Player player;
     @Getter
     private boolean status;
+    @Getter
     private final SearchBar searchBar;
     private boolean lastSearched;
     @Getter
@@ -63,6 +65,9 @@ public final class User extends UserAbstract {
     private Map<String, Integer> topAlbums;
     @Getter @Setter
     private Map<String, Integer> topEpisodes;
+
+    @Getter @Setter
+    private ArrayList<String> boughtMerch;
 
     /**
      * Instantiates a new User.
@@ -90,6 +95,8 @@ public final class User extends UserAbstract {
         topSongs = new HashMap<>();
         topAlbums = new HashMap<>();
         topEpisodes = new HashMap<>();
+
+        boughtMerch = new ArrayList<>();
     }
 
     @Override
@@ -209,6 +216,7 @@ public final class User extends UserAbstract {
             updatePodcastStats(this, player, podcast, timestamp);
         }
 
+        player.setCurrentSong(null);
         player.setLastTimestamp(timestamp);
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
         searchBar.clearSelection();
@@ -645,30 +653,26 @@ public final class User extends UserAbstract {
      * @return the wrapped stats
      */
     public ObjectNode wrapped(final int timestamp) {
-        if (searchBar.getLastSearchType() != null) {
-            if (searchBar.getLastSearchType().equals("song")) {
-                Song song = (Song) searchBar.getLastSelected();
-                updateSongStats(this, song);
-            }
+        if (player.getLastLoadedSource() != null
+                && player.getType().equals("playlist")) {
 
-            if (player.getLastLoadedSource() != null
-                    && player.getType().equals("playlist")) {
+            Playlist playlist = (Playlist) player.getCurrentAudioCollection();
+            updatePlaylistStats(this, player, playlist, timestamp);
+            player.setLastTimestamp(timestamp);
 
-                Playlist playlist = (Playlist) player.getCurrentAudioCollection();
-                updatePlaylistStats(this, player, playlist, timestamp);
+        } else if (player.getLastLoadedSource() != null
+                && player.getType().equals("album")) {
 
-            } else if (player.getLastLoadedSource() != null
-                    && player.getType().equals("album")) {
+            Album album = (Album) player.getCurrentAudioCollection();
+            updateAlbumStats(this, player, album, timestamp);
+            player.setLastTimestamp(timestamp);
 
-                Album album = (Album) player.getCurrentAudioCollection();
-                updateAlbumStats(this, player, album, timestamp);
+        } else if (player.getLastLoadedSource() != null
+                && player.getType().equals("podcast")) {
 
-            } else if (player.getLastLoadedSource() != null
-                    && player.getType().equals("podcast")) {
-
-                Podcast podcast = (Podcast) player.getCurrentAudioCollection();
-                updatePodcastStats(this, player, podcast, timestamp);
-            }
+            Podcast podcast = (Podcast) player.getCurrentAudioCollection();
+            updatePodcastStats(this, player, podcast, timestamp);
+            player.setLastTimestamp(timestamp);
         }
 
         Map<String, Integer> sortedTopArtists = getTopFive(topArtists);
@@ -686,6 +690,29 @@ public final class User extends UserAbstract {
         addMapToNode(output, "topAlbums", sortedTopAlbums);
         addMapToNode(output, "topEpisodes", sortedTopEpisodes);
         return output;
+    }
+
+    /**
+     * Buys merch from content creator.
+     *
+     * @param commandInput the command input
+     * @return the message
+     */
+    public String buyMerch(final CommandInput commandInput) {
+        if (getSearchBar() != null && getSearchBar().
+                getLastSearchType().equals("artist")) {
+
+            Artist artist = (Artist) getSearchBar().getLastContentCreatorSelected();
+            for (Merchandise merch : artist.getMerch()) {
+                if (merch.getName().equals(commandInput.getName())) {
+                    boughtMerch.add(merch.getName());
+                    artist.setMerchRevenue(artist.getMerchRevenue() + merch.getPrice());
+                    artist.setSales(artist.getSales() + 1);
+                    return getUsername() + " has added new merch successfully.";
+                }
+            }
+        }
+        return "The merch " + commandInput.getName() + " doesn't exist.";
     }
 }
 

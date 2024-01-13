@@ -4,18 +4,19 @@ import java.util.*;
 
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
+import app.audio.Collections.Playlist;
+import app.audio.Collections.Podcast;
 import app.audio.Files.Song;
 import app.pages.ArtistPage;
+import app.player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import static app.utils.MapManagement.addMapToNode;
-import static app.utils.MapManagement.getTopFive;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
+import static app.utils.MapManagement.*;
 
 
 /**
@@ -169,13 +170,30 @@ public final class Artist extends ContentCreator {
      *
      * @return the wrapped stats
      */
-    public ObjectNode wrapped() {
+    public ObjectNode wrapped(final int timestamp) {
+        for (User user : app.Admin.getInstance().getUsers()) {
+            Player player = user.getPlayer();
+            if (player.getLastLoadedSource() != null
+                    && player.getType().equals("playlist")) {
+
+                Playlist playlist = (Playlist) player.getCurrentAudioCollection();
+                updatePlaylistStats(user, player, playlist, timestamp);
+                player.setLastTimestamp(timestamp);
+
+            } else if (player.getLastLoadedSource() != null
+                    && player.getType().equals("album")) {
+
+                Album album = (Album) player.getCurrentAudioCollection();
+                updateAlbumStats(user, player, album, timestamp);
+                player.setLastTimestamp(timestamp);
+            }
+        }
+
         Map<String, Integer> sortedTopAlbums = getTopFive(topAlbums);
         Map<String, Integer> sortedTopSongs = getTopFive(topSongs);
         Map<String, Integer> sortedTopFans = getTopFive(topFans);
         Set<String> keySet = sortedTopFans.keySet();
         List<String> topFansNames = new ArrayList<>(keySet);
-
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode output = objectMapper.createObjectNode();

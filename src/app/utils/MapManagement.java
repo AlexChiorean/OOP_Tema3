@@ -10,13 +10,33 @@ import app.user.Artist;
 import app.user.Host;
 import app.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
 
 public class MapManagement {
+    /**
+     * Sorts map by value, then by key.
+     *
+     * @param map the unsorted map
+     * @return the sorted map
+     */
+    public static Map<String, Double> sortByKeyThenValueDouble(final Map<String, Double> map) {
+        List<Map.Entry<String, Double>> entryList = new ArrayList<>(map.entrySet());
+
+        Comparator<Map.Entry<String, Double>> byValueAndKey = Comparator
+                .<Map.Entry<String, Double>>comparingDouble(Map.Entry::getValue).reversed()
+                .thenComparing(Map.Entry::getKey);
+
+        entryList.sort(byValueAndKey);
+
+        Map<String, Double> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
 
     /**
      * Sorts map by value, then by key.
@@ -87,11 +107,26 @@ public class MapManagement {
         user.getTopAlbums().merge(song.getAlbum(), 1, Integer::sum);
         user.getTopArtists().merge(song.getArtist(), 1, Integer::sum);
 
+        if (user.getPlayer().getCurrentSong() != null) {
+            Song currentSong = user.getPlayer().getCurrentSong();
+            user.getTopSongs().merge(currentSong.getName(), -1, Integer::sum);
+            user.getTopGenres().merge(currentSong.getGenre(), -1, Integer::sum);
+            user.getTopAlbums().merge(currentSong.getAlbum(), -1, Integer::sum);
+            user.getTopArtists().merge(currentSong.getArtist(), -1, Integer::sum);
+        }
+
         for (Artist artist : app.Admin.getInstance().getArtists()) {
             if (artist.getUsername().equals(song.getArtist())) {
                 artist.getTopFans().merge(user.getUsername(), 1, Integer::sum);
                 artist.getTopSongs().merge(song.getName(), 1, Integer::sum);
                 artist.getTopAlbums().merge(song.getAlbum(), 1, Integer::sum);
+
+                if (user.getPlayer().getCurrentSong() != null) {
+                    Song currentSong = user.getPlayer().getCurrentSong();
+                    artist.getTopFans().merge(user.getUsername(), -1, Integer::sum);
+                    artist.getTopSongs().merge(currentSong.getName(), -1, Integer::sum);
+                    artist.getTopAlbums().merge(currentSong.getAlbum(), -1, Integer::sum);
+                }
             }
         }
     }
@@ -126,11 +161,24 @@ public class MapManagement {
                                         final int timestamp) {
 
         int timeInterval = timestamp - player.getLastTimestamp();
+        boolean gotToCurrentSong = false;
+
         if (album != null) {
             for (Song song : album.getSongs()) {
-                if (timeInterval >= 0) {
+
+                if (player.getCurrentSong() != null
+                        && song == player.getCurrentSong()) {
+                    gotToCurrentSong = true;
+                }
+                if ((player.getCurrentSong() == null || gotToCurrentSong)
+                        && timeInterval >= 0) {
                     timeInterval -= song.getDuration();
                     updateSongStats(user, song);
+                    if (timeInterval < 0) {
+                        player.setCurrentSong(song);
+                    } else {
+                        player.setCurrentSong(null);
+                    }
                 }
             }
         }

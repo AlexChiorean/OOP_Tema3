@@ -790,6 +790,8 @@ public final class CommandRunner {
      * @return the wrapped stats
      */
     public static ObjectNode wrapped(final CommandInput commandInput) {
+        ObjectNode wrappedStats = admin.wrapped(commandInput);
+
         String message = null;
         for (User user : admin.getUsers()) {
             if (user.getUsername().equals(commandInput.getUsername())
@@ -797,8 +799,6 @@ public final class CommandRunner {
                 message = "No data to show for user " + user.getUsername() + ".";
             }
         }
-
-        ObjectNode wrappedStats = admin.wrapped(commandInput);
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", commandInput.getCommand());
@@ -823,6 +823,41 @@ public final class CommandRunner {
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put("command", "endProgram");
         objectNode.put("result", admin.endProgram());
+        return objectNode;
+    }
+
+    /**
+     * Buys merch from the content creator.
+     *
+     * @param commandInput the command input
+     * @return the bought merch
+     */
+    public static ObjectNode buyMerch(final CommandInput commandInput) {
+        String message = admin.buyMerch(commandInput);
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    /**
+     *
+     */
+    public static ObjectNode seeMerch(final CommandInput commandInput) {
+        ArrayList<String> results = new ArrayList<>();
+        for (User user : admin.getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())) {
+                results = user.getBoughtMerch();
+            }
+        }
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("result", objectMapper.valueToTree(results));
+
         return objectNode;
     }
 }

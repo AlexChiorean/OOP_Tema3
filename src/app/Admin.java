@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static app.utils.MapManagement.sortByKeyThenValue;
+import static app.utils.MapManagement.sortByKeyThenValueDouble;
 
 /**
  * The type Admin.
@@ -66,7 +67,7 @@ public final class Admin {
     private static Admin instance;
 
     @Getter @Setter
-    private Map<String, Integer> topRevenue;
+    private Map<String, Double> topRevenue;
 
     private Admin() {
         topRevenue = new HashMap<>();
@@ -893,7 +894,7 @@ public final class Admin {
     public ObjectNode wrapped(final CommandInput commandInput) {
         for (Artist artist : getArtists()) {
             if (artist.getUsername().equals(commandInput.getUsername())) {
-                return artist.wrapped();
+                return artist.wrapped(commandInput.getTimestamp());
             }
         }
         for (User user : getUsers()) {
@@ -916,17 +917,18 @@ public final class Admin {
      */
     public ObjectNode endProgram() {
         for (Artist artist : getArtists()) {
-            if (!artist.getTopFans().isEmpty()) {
-                topRevenue.put(artist.getUsername(), artist.getSales());
+            if (!artist.getTopFans().isEmpty()
+                    || artist.getSongRevenue() + artist.getMerchRevenue() != 0) {
+                topRevenue.put(artist.getUsername(), artist.getSongRevenue() + artist.getMerchRevenue());
             }
         }
-        topRevenue = sortByKeyThenValue(topRevenue);
+        topRevenue = sortByKeyThenValueDouble(topRevenue);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode output = objectMapper.createObjectNode();
 
         int ranking = 1;
-        for (Map.Entry<String, Integer> entry : topRevenue.entrySet()) {
+        for (Map.Entry<String, Double> entry : topRevenue.entrySet()) {
             for (Artist artist : getArtists()) {
                 if (artist.getUsername().equals(entry.getKey())) {
                     ObjectNode nodeList = objectMapper.createObjectNode();
@@ -942,5 +944,22 @@ public final class Admin {
             ranking++;
         }
         return output;
+    }
+
+    /**
+     * Buys merch of a content creator.
+     *
+     * @return the bought merch
+     */
+    public String buyMerch(final CommandInput commandInput) {
+        User commandUser = null;
+        for (User user : Admin.instance.getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())) {
+                commandUser = user;
+                break;
+            }
+        }
+        String message = commandUser.buyMerch(commandInput);
+        return message;
     }
 }
