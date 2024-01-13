@@ -843,7 +843,10 @@ public final class CommandRunner {
     }
 
     /**
+     * Shows the merch bought by user
      *
+     * @param commandInput the command input
+     * @return the bought merch
      */
     public static ObjectNode seeMerch(final CommandInput commandInput) {
         ArrayList<String> results = new ArrayList<>();
@@ -857,6 +860,39 @@ public final class CommandRunner {
         objectNode.put("user", commandInput.getUsername());
         objectNode.put("timestamp", commandInput.getTimestamp());
         objectNode.put("result", objectMapper.valueToTree(results));
+
+        return objectNode;
+    }
+    /**
+     * Subscribes to content creator
+     *
+     * @commandInput the command input
+     * @return the subscription message
+     */
+    public static ObjectNode subscribe(final CommandInput commandInput) {
+        String message = admin.subscribe(commandInput);
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("message", message);
+        return objectNode;
+    }
+
+    /**
+     * Shows the notifications
+     *
+     * @param commandInput the command input
+     * @return the notifications
+     */
+    public static ObjectNode getNotifications(final CommandInput commandInput) {
+        ArrayNode notifications = admin.getNotifications(commandInput);
+
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", commandInput.getCommand());
+        objectNode.put("user", commandInput.getUsername());
+        objectNode.put("timestamp", commandInput.getTimestamp());
+        objectNode.put("notifications", notifications);
 
         return objectNode;
     }

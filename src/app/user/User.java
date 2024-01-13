@@ -68,6 +68,10 @@ public final class User extends UserAbstract {
 
     @Getter @Setter
     private ArrayList<String> boughtMerch;
+    @Getter
+    private ArrayList<String> notificationList;
+    @Getter
+    private ArrayList<ContentCreator> subscriptions;
 
     /**
      * Instantiates a new User.
@@ -97,6 +101,8 @@ public final class User extends UserAbstract {
         topEpisodes = new HashMap<>();
 
         boughtMerch = new ArrayList<>();
+        notificationList = new ArrayList<>();
+        subscriptions = new ArrayList<>();
     }
 
     @Override
@@ -713,6 +719,49 @@ public final class User extends UserAbstract {
             }
         }
         return "The merch " + commandInput.getName() + " doesn't exist.";
+    }
+    /**
+     * Subscribes to selected content creator.
+     */
+    public String subscribe() {
+        if (searchBar.getLastContentCreatorSelected() == null) {
+            return "No selected content creator";
+        }
+        for (ContentCreator contentCreator : subscriptions) {
+            if (searchBar.getLastContentCreatorSelected() == contentCreator) {
+                subscriptions.remove(contentCreator);
+                return getUsername() + " unsubscribed from "
+                + searchBar.getLastContentCreatorSelected().getUsername() + " successfully.";
+            }
+        }
+        subscriptions.add(searchBar.getLastContentCreatorSelected());
+        return getUsername() + " subscribed to "
+                + searchBar.getLastContentCreatorSelected().getUsername() + " successfully.";
+    }
+
+    /**
+     * Gets the notifications of the user.
+     *
+     * @returns the notifications
+     */
+    public ArrayNode getNotifications() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode results = objectMapper.createArrayNode();
+
+        for (String notification : notificationList) {
+            ObjectNode entry = objectMapper.createObjectNode();
+            if (notification.startsWith("New Album")) {
+                entry.put("name", "New Album");
+            } else if (notification.startsWith("New Merchandise")) {
+                entry.put("name", "New Merchandise");
+            } else {
+                entry.put("name", "New Event");
+            }
+            entry.put("description", notification);
+            results.add(entry);
+        }
+        notificationList.clear();
+        return results;
     }
 }
 

@@ -8,13 +8,7 @@ import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.player.Player;
-import app.user.Announcement;
-import app.user.Artist;
-import app.user.Event;
-import app.user.Host;
-import app.user.Merchandise;
-import app.user.User;
-import app.user.UserAbstract;
+import app.user.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -407,6 +401,15 @@ public final class Admin {
                                                 username,
                                                 newSongs,
                                                 commandInput.getReleaseYear()));
+
+        for (User user : getInstance().getUsers()) {
+            for (ContentCreator contentCreator : user.getSubscriptions()) {
+                if (commandInput.getUsername().equals(contentCreator.getUsername())) {
+                    user.getNotificationList().add("New Album from "
+                            + commandInput.getUsername() + ".");
+                }
+            }
+        }
         return "%s has added new album successfully.".formatted(username);
     }
 
@@ -566,6 +569,15 @@ public final class Admin {
         currentArtist.getEvents().add(new Event(eventName,
                                                 commandInput.getDescription(),
                                                 commandInput.getDate()));
+
+        for (User user : getInstance().getUsers()) {
+            for (ContentCreator contentCreator : user.getSubscriptions()) {
+                if (commandInput.getUsername().equals(contentCreator.getUsername())) {
+                    user.getNotificationList().add("New Event from "
+                            + commandInput.getUsername() + ".");
+                }
+            }
+        }
         return "%s has added new event successfully.".formatted(username);
     }
 
@@ -650,6 +662,15 @@ public final class Admin {
         currentArtist.getMerch().add(new Merchandise(commandInput.getName(),
                                                      commandInput.getDescription(),
                                                      commandInput.getPrice()));
+
+        for (User user : getInstance().getUsers()) {
+            for (ContentCreator contentCreator : user.getSubscriptions()) {
+                if (commandInput.getUsername().equals(contentCreator.getUsername())) {
+                    user.getNotificationList().add("New Merchandise from "
+                            + commandInput.getUsername() + ".");
+                }
+            }
+        }
         return "%s has added new merchandise successfully.".formatted(username);
     }
 
@@ -961,5 +982,33 @@ public final class Admin {
         }
         String message = commandUser.buyMerch(commandInput);
         return message;
+    }
+    /**
+     * Subscribes to content creator
+     *
+     * @commandInput the command input
+     * @return the subscription message
+     */
+    public static String subscribe(final CommandInput commandInput) {
+        for (User user : getInstance().getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())) {
+                return user.subscribe();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets notifications received by yser
+     *
+     * @return the notifications
+     */
+    public ArrayNode getNotifications(final CommandInput commandInput) {
+        for (User user : getInstance().getUsers()) {
+            if (user.getUsername().equals(commandInput.getUsername())) {
+                return user.getNotifications();
+            }
+        }
+       return null;
     }
 }
