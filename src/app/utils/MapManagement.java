@@ -12,11 +12,18 @@ import app.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.*;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 
 
-public class MapManagement {
+public final class MapManagement {
     private static final int LIMIT = 5;
+
+    private MapManagement() {
+    }
 
     /**
      * Sorts map by value, then by key.

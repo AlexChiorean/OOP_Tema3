@@ -2,7 +2,7 @@ package app.audio.Files;
 
 import java.util.ArrayList;
 
-public class SongBuilder{
+public class SongBuilder {
     private String name;
     private Integer duration;
     private String album;
@@ -14,73 +14,73 @@ public class SongBuilder{
 
     /**
      * adds the name to the builder
-     * @param name the name
+     * @param addName the name
      */
-    public SongBuilder name(String name) {
-        this.name = name;
+    public SongBuilder name(final String addName) {
+        this.name = addName;
         return this;
     }
 
     /**
      * adds the duration to the builder
-     * @param duration the duration
+     * @param addDuration the duration
      */
-    public SongBuilder duration(Integer duration) {
-        this.duration = duration;
+    public SongBuilder duration(final Integer addDuration) {
+        this.duration = addDuration;
         return this;
     }
 
     /**
      * adds the album to the builder
-     * @param album the album
+     * @param addAlbum the album
      */
-    public SongBuilder album(String album) {
-        this.album = album;
+    public SongBuilder album(final String addAlbum) {
+        this.album = addAlbum;
         return this;
     }
 
     /**
      * adds the tags to the builder
-     * @param tags the tags
+     * @param addTags the tags
      */
-    public SongBuilder tags(ArrayList<String> tags) {
-        this.tags = tags;
+    public SongBuilder tags(final ArrayList<String> addTags) {
+        this.tags = addTags;
         return this;
     }
 
     /**
      * adds the lyrics to the builder
-     * @param lyrics the lyrics
+     * @param addLyrics the lyrics
      */
-    public SongBuilder lyrics(String lyrics) {
-        this.lyrics = lyrics;
+    public SongBuilder lyrics(final String addLyrics) {
+        this.lyrics = addLyrics;
         return this;
     }
 
     /**
      * adds the genre to the builder
-     * @param genre the genre
+     * @param addGenre the genre
      */
-    public SongBuilder genre(String genre) {
-        this.genre = genre;
+    public SongBuilder genre(final String addGenre) {
+        this.genre = addGenre;
         return this;
     }
 
     /**
      * adds the releaseYear to the builder
-     * @param releaseYear the release year
+     * @param addReleaseYear the release year
      */
-    public SongBuilder releaseYear(Integer releaseYear) {
-        this.releaseYear = releaseYear;
+    public SongBuilder releaseYear(final Integer addReleaseYear) {
+        this.releaseYear = addReleaseYear;
         return this;
     }
 
     /**
      * adds the artist to the builder
-     * @param artist the artist
+     * @param addArtist the artist
      */
-    public SongBuilder artist(String artist) {
-        this.artist = artist;
+    public SongBuilder artist(final String addArtist) {
+        this.artist = addArtist;
         return this;
     }
 
@@ -89,6 +89,7 @@ public class SongBuilder{
      * @return the new song
      */
     public Song build() {
-        return new Song(name, duration, album, tags, lyrics, genre, releaseYear, artist);
+        return new Song(this.name, this.duration, this.album, this.tags,
+                this.lyrics, this.genre, this.releaseYear, this.artist);
     }
 }

@@ -9,7 +9,15 @@ import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.audio.Files.SongBuilder;
 import app.player.Player;
-import app.user.*;
+import app.user.User;
+import app.user.Host;
+import app.user.Artist;
+import app.user.Merchandise;
+import app.user.UserAbstract;
+import app.user.ContentCreator;
+import app.user.Announcement;
+import app.user.Event;
+import app.user.ConcreteVisitor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -949,7 +957,8 @@ public final class Admin {
         for (Artist artist : getArtists()) {
             if (!artist.getTopFans().isEmpty()
                     || artist.getSongRevenue() + artist.getMerchRevenue() != 0) {
-                topRevenue.put(artist.getUsername(), artist.getSongRevenue() + artist.getMerchRevenue());
+                topRevenue.put(artist.getUsername(), artist.getSongRevenue()
+                        + artist.getMerchRevenue());
             }
         }
         topRevenue = sortByKeyThenValueDouble(topRevenue);

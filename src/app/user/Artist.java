@@ -1,22 +1,27 @@
 package app.user;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import app.audio.Collections.Album;
 import app.audio.Collections.AlbumOutput;
 import app.audio.Collections.Playlist;
-import app.audio.Collections.Podcast;
 import app.audio.Files.Song;
 import app.pages.ArtistPage;
 import app.player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
-import static app.utils.MapManagement.*;
+import static app.utils.MapManagement.updatePlaylistStats;
+import static app.utils.MapManagement.updateAlbumStats;
+import static app.utils.MapManagement.getTopFive;
+import static app.utils.MapManagement.addMapToNode;
 
 
 /**
@@ -205,7 +210,7 @@ public final class Artist extends ContentCreator {
 
         addMapToNode(output, "topAlbums", sortedTopAlbums);
         addMapToNode(output, "topSongs", sortedTopSongs);
-        output.put( "topFans", objectMapper.valueToTree(topFansNames));
+        output.put("topFans", objectMapper.valueToTree(topFansNames));
 
         output.put("listeners", topFans.size());
         return output;

@@ -1,6 +1,10 @@
 package app.user;
 
-import app.audio.Collections.*;
+import app.audio.Collections.Album;
+import app.audio.Collections.Playlist;
+import app.audio.Collections.AudioCollection;
+import app.audio.Collections.Podcast;
+import app.audio.Collections.PlaylistOutput;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
@@ -27,7 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static app.utils.MapManagement.*;
+import static app.utils.MapManagement.updateSongStats;
+import static app.utils.MapManagement.updatePlaylistStats;
+import static app.utils.MapManagement.updateAlbumStats;
+import static app.utils.MapManagement.updatePodcastStats;
+import static app.utils.MapManagement.getTopFive;
+import static app.utils.MapManagement.addMapToNode;
 
 /**
  * The type User.
