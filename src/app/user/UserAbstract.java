@@ -3,7 +3,7 @@ package app.user;
 /**
  * The type User abstract.
  */
-public abstract class UserAbstract {
+public abstract class UserAbstract implements Visitable {
     private String username;
     private int age;
     private String city;

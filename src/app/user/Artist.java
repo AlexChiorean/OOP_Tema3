@@ -45,6 +45,11 @@ public final class Artist extends ContentCreator {
     @Getter @Setter
     private String mostProfitableSong;
 
+    @Override
+    public ObjectNode accept(final Visitor visitor, final int timestamp) {
+        return visitor.visit(this, timestamp);
+    }
+
     /**
      * Instantiates a new Artist.
      *

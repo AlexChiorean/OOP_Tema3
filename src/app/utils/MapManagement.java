@@ -16,6 +16,8 @@ import java.util.*;
 
 
 public class MapManagement {
+    private static final int LIMIT = 5;
+
     /**
      * Sorts map by value, then by key.
      *
@@ -74,7 +76,9 @@ public class MapManagement {
         for (Map.Entry<String, Integer> entry : entryList.entrySet()) {
             count++;
             sortedMap.put(entry.getKey(), entry.getValue());
-            if (count == 5) return sortedMap;
+            if (count == LIMIT) {
+                return sortedMap;
+            }
         }
         return sortedMap;
     }

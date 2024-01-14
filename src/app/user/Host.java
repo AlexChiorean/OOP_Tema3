@@ -3,7 +3,6 @@ package app.user;
 import app.audio.Collections.Podcast;
 import app.pages.HostPage;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +27,11 @@ public final class Host extends ContentCreator {
     private Map<String, Integer> topFans;
     @Getter @Setter
     private int listeners;
+
+    @Override
+    public ObjectNode accept(final Visitor visitor, final int timestamp) {
+        return visitor.visit(this);
+    }
 
     /**
      * Instantiates a new Host.

@@ -2,7 +2,6 @@ package app.user;
 
 import app.audio.Collections.*;
 import app.audio.Files.AudioFile;
-import app.audio.Files.Episode;
 import app.audio.Files.Song;
 import app.audio.LibraryEntry;
 import app.pages.HomePage;
@@ -13,7 +12,6 @@ import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
-import app.utils.MapManagement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,6 +70,11 @@ public final class User extends UserAbstract {
     private ArrayList<String> notificationList;
     @Getter
     private ArrayList<ContentCreator> subscriptions;
+
+    @Override
+    public ObjectNode accept(final Visitor visitor, final int timestamp) {
+        return visitor.visit(this, timestamp);
+    }
 
     /**
      * Instantiates a new User.

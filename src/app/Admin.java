@@ -913,19 +913,23 @@ public final class Admin {
      * @return the wrapped stats
      */
     public ObjectNode wrapped(final CommandInput commandInput) {
+        ConcreteVisitor visitor = new ConcreteVisitor();
         for (Artist artist : getArtists()) {
             if (artist.getUsername().equals(commandInput.getUsername())) {
-                return artist.wrapped(commandInput.getTimestamp());
+                return artist.accept(visitor, commandInput.getTimestamp());
+                //return artist.wrapped(commandInput.getTimestamp());
             }
         }
         for (User user : getUsers()) {
             if (user.getUsername().equals(commandInput.getUsername())) {
-                return user.wrapped(commandInput.getTimestamp());
+                return user.accept(visitor, commandInput.getTimestamp());
+                //return user.wrapped(commandInput.getTimestamp());
             }
         }
         for (Host host : getHosts()) {
             if (host.getUsername().equals(commandInput.getUsername())) {
-                return host.wrapped();
+                return host.accept(visitor, commandInput.getTimestamp());
+                //return host.wrapped();
             }
         }
         return null;
