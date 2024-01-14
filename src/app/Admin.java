@@ -7,6 +7,7 @@ import app.audio.Collections.Podcast;
 import app.audio.Files.AudioFile;
 import app.audio.Files.Episode;
 import app.audio.Files.Song;
+import app.audio.Files.SongBuilder;
 import app.player.Player;
 import app.user.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static app.utils.MapManagement.sortByKeyThenValue;
 import static app.utils.MapManagement.sortByKeyThenValueDouble;
 
 /**
@@ -104,9 +104,14 @@ public final class Admin {
      */
     public void setSongs(final List<SongInput> songInputList) {
         for (SongInput songInput : songInputList) {
-            songs.add(new Song(songInput.getName(), songInput.getDuration(), songInput.getAlbum(),
-                    songInput.getTags(), songInput.getLyrics(), songInput.getGenre(),
-                    songInput.getReleaseYear(), songInput.getArtist()));
+            SongBuilder builder = new SongBuilder();
+            builder.name(songInput.getName()).duration(songInput.getDuration())
+                    .album(songInput.getAlbum()).tags(songInput.getTags())
+                    .lyrics(songInput.getLyrics()).lyrics(songInput.getGenre())
+                    .genre(songInput.getGenre()).releaseYear(songInput.getReleaseYear())
+                    .artist(songInput.getArtist());
+            Song song = builder.build();
+            songs.add(song);
         }
     }
 

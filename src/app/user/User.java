@@ -11,6 +11,9 @@ import app.player.Player;
 import app.player.PlayerStats;
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
+import app.user.notification.AlbumNotification;
+import app.user.notification.EventNotification;
+import app.user.notification.MerchNotification;
 import app.utils.Enums;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -753,14 +756,18 @@ public final class User extends UserAbstract {
 
         for (String notification : notificationList) {
             ObjectNode entry = objectMapper.createObjectNode();
+
             if (notification.startsWith("New Album")) {
-                entry.put("name", "New Album");
+                AlbumNotification strategy = new AlbumNotification();
+                strategy.addNotification(entry, notification);
+
             } else if (notification.startsWith("New Merchandise")) {
-                entry.put("name", "New Merchandise");
+                MerchNotification strategy = new MerchNotification();
+                strategy.addNotification(entry, notification);
             } else {
-                entry.put("name", "New Event");
+                EventNotification strategy = new EventNotification();
+                strategy.addNotification(entry, notification);
             }
-            entry.put("description", notification);
             results.add(entry);
         }
         notificationList.clear();
