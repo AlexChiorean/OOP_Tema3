@@ -930,19 +930,16 @@ public final class Admin {
         for (Artist artist : getArtists()) {
             if (artist.getUsername().equals(commandInput.getUsername())) {
                 return artist.accept(visitor, commandInput.getTimestamp());
-                //return artist.wrapped(commandInput.getTimestamp());
             }
         }
         for (User user : getUsers()) {
             if (user.getUsername().equals(commandInput.getUsername())) {
                 return user.accept(visitor, commandInput.getTimestamp());
-                //return user.wrapped(commandInput.getTimestamp());
             }
         }
         for (Host host : getHosts()) {
             if (host.getUsername().equals(commandInput.getUsername())) {
                 return host.accept(visitor, commandInput.getTimestamp());
-                //return host.wrapped();
             }
         }
         return null;
